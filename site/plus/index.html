@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get MBC Plus</title>
+<meta name="description" content="Download MBC Plus — watch MBC TV and MBC 2 on the Go, listen to Radio 1 and Radio 2, and catch up on demand.">
+<meta name="theme-color" content="#901820">
+<meta name="apple-itunes-app" content="app-id=6746721895">
+<meta property="og:title" content="MBC Plus — TV and radio from MBC, anywhere">
+<meta property="og:description" content="Watch MBC TV and MBC 2 on the Go, listen to Radio 1 and Radio 2, and catch up on demand.">
+<meta property="og:image" content="https://mbc.mw/plus/mbc-mark.png">
+<link rel="icon" href="favicon.png" type="image/png">
+<script>
+  // Phones go straight to the right store; everyone else sees this page.
+  (function () {
+    var ua = navigator.userAgent || "";
+    var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    if (ios) location.replace("https://apps.apple.com/app/id6746721895");
+    else if (android) location.replace("https://play.google.com/store/apps/details?id=com.mbc.mbcplus");
+  })();
+</script>
+<style>
+  :root {
+    --maroon: #901820;
+    --maroon-dark: #6e1218;
+    --red: #d82028;
+    --green: #009048;
+    --ink: #1a1214;
+    --muted: #6b5f61;
+    --line: #eadfe0;
+    --paper: #fbf8f7;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink);
+    background: var(--paper); overflow-x: hidden; position: relative;
+  }
+  /* big faint brand mark in the background */
+  body::before {
+    content: ""; position: fixed; width: min(80vw, 640px); aspect-ratio: 588 / 551;
+    right: -12vw; bottom: -14vh; background: url("mbc-mark.png") center / contain no-repeat;
+    opacity: .07; pointer-events: none; z-index: 0;
+  }
+  main {
+    position: relative; z-index: 1; width: 100%; max-width: 440px; background: #fff;
+    border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(26,18,20,.04), 0 12px 32px rgba(144,24,32,.08);
+    animation: rise .5s ease-out both;
+  }
+  .stripe { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 6px; }
+  .stripe i:nth-child(1) { background: #111; }
+  .stripe i:nth-child(2) { background: var(--red); }
+  .stripe i:nth-child(3) { background: var(--green); }
+  .body { padding: 28px 28px 24px; text-align: center; }
+  .logo { display: block; width: 156px; height: auto; margin: 0 auto 24px; }
+  .mark {
+    width: 88px; height: 88px; margin: 0 auto 16px; border-radius: 22px; display: grid; place-items: center;
+    background: #fff; border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(144,24,32,.12);
+  }
+  .mark img { width: 60px; height: auto; display: block; }
+  h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.1; letter-spacing: -0.02em; }
+  h1 span { color: var(--red); }
+  .lede { margin: 0 auto 20px; max-width: 32ch; color: var(--muted); line-height: 1.5; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
+  .chips li {
+    font-size: 13px; font-weight: 600; color: var(--maroon); background: #fbeeee;
+    border: 1px solid #f2d9da; border-radius: 999px; padding: 6px 12px;
+  }
+  .btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 18px; margin-top: 12px; border-radius: 12px; text-decoration: none; text-align: left;
+    background: var(--maroon); color: #fff; transition: background .15s ease, transform .15s ease;
+  }
+  .btn:hover { background: var(--maroon-dark); transform: translateY(-1px); }
+  .btn:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .btn small { display: block; font-size: 12px; opacity: .8; }
+  .btn strong { display: block; font-size: 17px; }
+  .btn svg { flex: none; width: 18px; height: 18px; opacity: .9; }
+  .btn.alt { background: #fff; color: var(--maroon); border: 1.5px solid var(--maroon); }
+  .btn.alt:hover { background: #fbeeee; }
+  footer {
+    border-top: 1px solid var(--line); padding: 14px 28px; display: flex; justify-content: space-between;
+    align-items: center; gap: 12px; font-size: 12px; color: var(--muted);
+  }
+  footer em { font-style: normal; color: var(--maroon); font-weight: 600; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { main { animation: none; } .btn { transition: none; } }
+  @media (max-width: 420px) { footer { flex-direction: column; text-align: center; gap: 2px; } }
+  @media (max-width: 380px) { .body { padding: 24px 20px 20px; } h1 { font-size: 26px; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="stripe" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="body">
+    <img class="logo" src="mbc-logo.png" alt="MBC — inspiring the nation" width="320" height="137">
+    <div class="mark"><img src="mbc-mark.png" alt="" width="240" height="225"></div>
+    <h1>MBC <span>Plus</span></h1>
+    <p class="lede">TV and radio from MBC, wherever you are. Watch live, listen live, or catch up on demand.</p>
+    <ul class="chips" aria-label="What's on MBC Plus">
+      <li>MBC TV</li><li>MBC 2 on the Go</li><li>Radio 1</li><li>Radio 2</li><li>On demand</li>
+    </ul>
+    <a class="btn" href="https://apps.apple.com/app/id6746721895">
+      <span><small>Download on the</small><strong>App Store</strong></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <a class="btn alt" href="https://play.google.com/store/apps/details?id=com.mbc.mbcplus">
+      <span><small>Get it on</small><strong>Google Play</strong></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <footer><span>Malawi Broadcasting Corporation</span><em>inspiring the nation</em></footer>
+</main>
+</body>
+</html>
