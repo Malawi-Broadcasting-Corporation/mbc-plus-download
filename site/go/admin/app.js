@@ -324,5 +324,91 @@
   });
   $("#copyLink").addEventListener("click", function () { copy(state.qr.url); });
 
+  // ---------- tabs ----------
+  var teamLoaded = false;
+  function showTab() {
+    var tab = location.hash === "#team" && $("#view-team") ? "team" : "codes";
+    $("#view-codes").hidden = tab !== "codes";
+    if ($("#view-team")) $("#view-team").hidden = tab !== "team";
+    document.querySelectorAll("[data-tab]").forEach(function (a) {
+      if (a.dataset.tab === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+    if (tab === "team" && !teamLoaded) { teamLoaded = true; loadTeam(); }
+  }
+  window.addEventListener("hashchange", showTab);
+
+  // ---------- team (admins only; the server checks too) ----------
+  var pwDlg = $("#pwDialog");
+  if (pwDlg) {
+    pwDlg.addEventListener("click", function (e) { if (e.target === pwDlg || e.target.hasAttribute("data-close")) pwDlg.close(); });
+    $("#pwCopy").addEventListener("click", function () { copy($("#pwValue").textContent); });
+
+    var uf = $("#userForm");
+    uf.username.addEventListener("input", function () { uf.username.value = uf.username.value.toLowerCase().replace(/\s+/g, "."); });
+    uf.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var err = $("#userError"); err.hidden = true;
+      api("user-add", { username: uf.username.value.trim(), role: uf.role.value }).then(function (d) {
+        uf.reset();
+        showPassword(d.username, d.password, true);
+        loadTeam();
+      }).catch(function (e) { err.textContent = e.message; err.hidden = false; });
+    });
+  }
+
+  function showPassword(name, pw, isNew) {
+    $("#pwIntro").textContent = isNew
+      ? "“" + name + "” has been added. Give them their username and this temporary password:"
+      : "New temporary password for “" + name + "”. They've been signed out everywhere.";
+    $("#pwValue").textContent = pw;
+    pwDlg.showModal();
+  }
+
+  function loadTeam() {
+    return api("users").then(function (d) { renderTeam(d.users, d.me); })
+      .catch(function (e) { $("#team").replaceChildren(el("p", { class: "alert", text: e.message })); });
+  }
+
+  function renderTeam(users, me) {
+    users.sort(function (a, b) { return (a.role === b.role ? 0 : a.role === "admin" ? -1 : 1) || a.username.localeCompare(b.username); });
+    $("#team").replaceChildren.apply($("#team"), users.map(function (u) {
+      var self = u.username === me;
+      var tags = [
+        el("span", { class: "tag " + u.role, text: u.role }),
+        self ? el("span", { class: "tag", text: "you" }) : null,
+        !u.active ? el("span", { class: "tag off", text: "disabled" }) : null,
+        u.active && u.mustChange ? el("span", { class: "tag wait", text: "hasn't signed in yet" }) : null
+      ];
+      var act = function (body, msg) {
+        body.username = u.username;
+        return api("user-update", body).then(function () { toast(msg); loadTeam(); }).catch(function (e) { alert(e.message); });
+      };
+      var actions = self ? [el("a", { class: "btn", href: "?password", text: "Change my password" })] : [
+        el("button", { class: "btn", text: "Reset password", onclick: function () {
+          if (!confirm("Reset the password for “" + u.username + "”?\n\nThey'll be signed out and get a new temporary password.")) return;
+          api("user-reset", { username: u.username }).then(function (d) { showPassword(d.username, d.password, false); loadTeam(); })
+            .catch(function (e) { alert(e.message); });
+        } }),
+        el("button", { class: "btn", text: u.role === "admin" ? "Make editor" : "Make admin", onclick: function () {
+          act({ role: u.role === "admin" ? "editor" : "admin" }, "Role changed");
+        } }),
+        el("button", { class: "btn", text: u.active ? "Disable" : "Enable", onclick: function () {
+          if (u.active && !confirm("Disable “" + u.username + "”? They'll be signed out and can't sign in until enabled again.")) return;
+          act({ active: !u.active }, u.active ? "Disabled" : "Enabled");
+        } }),
+        el("button", { class: "btn danger", text: "Delete", onclick: function () {
+          if (!confirm("Delete “" + u.username + "”? Their QR codes stay.")) return;
+          api("user-delete", { username: u.username }).then(function () { toast("Deleted"); loadTeam(); }).catch(function (e) { alert(e.message); });
+        } })
+      ];
+      return el("article", { class: "item" + (u.active ? "" : " paused") }, [
+        el("h3", null, [u.username].concat(tags)),
+        el("div", { class: "dest", text: "Last signed in: " + ago(u.lastLogin) + (u.createdBy ? "  ·  added by " + u.createdBy : "") }),
+        el("div", { class: "actions" }, actions)
+      ]);
+    }));
+  }
+
+  showTab();
   load();
 })();

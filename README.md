@@ -90,9 +90,11 @@ site/go/              -> public_html/go/ on the server
   inc/bootstrap.php   shared code (blocked from the web)
   admin/              the tool (sign-in required); QR codes are drawn in the browser
   data/               LIVE DATA, exists only on the server (blocked from the web)
-    config.php        users + settings (create from config.sample.php)
+    config.php        settings + one-time setup code (create from config.sample.php)
+    users.json        team accounts (managed in the tool)
     links.json        the QR codes
     scans.log         scan counts
+dev/router.php        local dev server that mimics the .htaccess rules
 ```
 
 No database is needed. Requires PHP 7.4 or newer (standard on cPanel).
@@ -100,11 +102,41 @@ No database is needed. Requires PHP 7.4 or newer (standard on cPanel).
 ## First-time setup (cPanel)
 
 1. Upload the contents of `site/go/` to `public_html/go/` (create the folder).
-2. In `public_html/go/data/`, copy `config.sample.php` to `config.php`.
-3. Open https://mbc.mw/go/admin. It shows a **Set up** screen: choose a username and password. It gives you one
-   line of text. Paste it into `config.php` under `'users'` and save.
-4. Reload https://mbc.mw/go/admin and sign in.
-5. More people: once signed in, use **Add teammate** to get a line for each person.
+2. In `public_html/go/data/`, copy `config.sample.php` to `config.php` and set `setup_code` to something long
+   and random.
+3. Open https://mbc.mw/go/admin. It shows **Set up**: enter the setup code and choose the first admin's
+   username and password. You're signed in. (The setup code only works while there are no accounts. You can
+   blank it afterwards.)
+
+## Team accounts
+
+Managed in the tool under **Team** (admins only). Nobody needs cPanel for this.
+
+| Role | Can |
+|---|---|
+| **Editor** | Create, edit, pause, delete and download QR codes |
+| **Admin** | Everything an editor can, plus manage the team |
+
+- **Add a person:** you get a one-time temporary password to give them privately. At first sign-in they
+  must choose their own.
+- **Forgotten password:** an admin clicks **Reset password**. That signs the person out everywhere and gives a
+  new temporary password.
+- **Someone leaves:** **Disable** (signs them out immediately, can be re-enabled) or **Delete**. Their QR
+  codes stay.
+- Everyone can change their own password via **My password**.
+- Safeguards: you can't change your own role, disable or delete yourself, and there's always at least one
+  active admin. Five wrong passwords from one address blocks sign-in for 15 minutes.
+- If every admin is locked out, the server manager can delete `data/users.json` (QR codes are unaffected),
+  set a new `setup_code`, and run setup again.
+
+## Running locally
+
+```
+php -S localhost:8080 -t site dev/router.php
+```
+
+Then open http://localhost:8080/go/admin/. For local testing, create `site/go/data/config.php` with
+`'base_url' => 'http://localhost:8080/go/'` and a `setup_code`. Local data in `site/go/data/` is gitignored.
 
 ## Updating the tool
 
