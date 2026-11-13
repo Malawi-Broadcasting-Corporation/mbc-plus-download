@@ -1,0 +1,4 @@
+# Live data that only exists on the server (never commit or upload over it)
+site/go/data/*
+!site/go/data/.htaccess
+!site/go/data/config.sample.php

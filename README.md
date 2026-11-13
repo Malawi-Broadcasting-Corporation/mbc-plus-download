@@ -57,3 +57,64 @@ The server is the mbc.mw cPanel account. The page lives at `/home/mbc/public_htm
 ## Brand
 
 Colours used: maroon `#901820`, red `#d82028`, green `#009048`, black `#111`.
+
+---
+
+# MBC QR codes: self-service tool for marketing
+
+Marketing can create QR codes for anything (events, flyers, other MBC platforms) without a developer.
+
+**Tool:** https://mbc.mw/go/admin · **Codes point to:** `https://mbc.mw/go/<name>`
+
+How it works: each QR code contains a short mbc.mw link, e.g. `mbc.mw/go/gala-programme`. The tool decides
+where that link sends people, so **the destination can be changed at any time without reprinting**.
+Pausing a link shows a friendly "This link has ended" page. Scans are counted per code (no personal data
+is stored: only time, link name and iPhone/Android/other).
+
+| Marketing can… | |
+|---|---|
+| Create a code | Name, short link, destination (any web page: event page, Google Maps pin, YouTube, form…) |
+| Send iPhone and Android to different places | Optional, e.g. app store links, like `/plus` does |
+| Download | SVG for print, 2000 px PNG for screens, with or without the MBC logo, in 4 brand colours |
+| Edit / pause / delete | Editing changes where an already-printed code goes |
+| See scans | Total, this week, last scan, 30-day trend |
+
+The existing `mbc.mw/plus` page and QR are separate and unchanged.
+
+## Files
+
+```
+site/go/              -> public_html/go/ on the server
+  index.php           the redirect: mbc.mw/go/<name> -> destination
+  .htaccess           routes /go/<name> to index.php (takes priority over WordPress, like /plus)
+  inc/bootstrap.php   shared code (blocked from the web)
+  admin/              the tool (sign-in required); QR codes are drawn in the browser
+  data/               LIVE DATA, exists only on the server (blocked from the web)
+    config.php        users + settings (create from config.sample.php)
+    links.json        the QR codes
+    scans.log         scan counts
+```
+
+No database is needed. Requires PHP 7.4 or newer (standard on cPanel).
+
+## First-time setup (cPanel)
+
+1. Upload the contents of `site/go/` to `public_html/go/` (create the folder).
+2. In `public_html/go/data/`, copy `config.sample.php` to `config.php`.
+3. Open https://mbc.mw/go/admin. It shows a **Set up** screen: choose a username and password. It gives you one
+   line of text. Paste it into `config.php` under `'users'` and save.
+4. Reload https://mbc.mw/go/admin and sign in.
+5. More people: once signed in, use **Add teammate** to get a line for each person.
+
+## Updating the tool
+
+Upload changed files from `site/go/` as usual. **Never delete `public_html/go/data/` or upload over its
+files.** The repo has no copies of the live data, so uploading the repo's `data/` folder is harmless. Include
+`data/` in your cPanel backups: it is the only copy of every QR code's destination.
+
+## Notes
+
+- Short links can't be renamed after creation (the name is inside printed codes). Make a new code instead.
+- Delete only codes that were never printed; use **Pause** otherwise.
+- Link previews (WhatsApp, Facebook, bots) are not counted as scans.
+- iPads that identify as Mac computers get the main destination, not the iPhone one.
